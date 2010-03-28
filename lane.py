@@ -17,19 +17,20 @@ class Lane:
 	def add_car(self, car):
 		self._car_queue.appendleft(car)
 
-	def get_offset(self, is_cur_lane=False):
+	def get_info_ahead(self, is_cur_lane=False):
 		if (len(self._car_queue) != 0) and (not is_cur_lane):
-			return self._car_queue[0].offset
+			lead = self._car_queue[0]
+			return (lead.offset, lead.vel, lead.length)
 		elif self._lane_becomes == None:
-			return None
+			return (None, 0, 0)
 		elif self._lane_becomes == 0:
-			return self.length
+			return (self.length, 0, 0)
 		else:
-			dist = self._lane_becomes.get_offset()
-			if dist == None:
-				return None
+			info = self._lane_becomes.get_info_ahead()
+			if info[0] == None:
+				return (None, info[1], info[2])
 			else:
-				return self.length + dist
+				return (self.length + info[0], info[1], info[2]) 
 
 	# Updates the lane.
 	def update_lane(self):
@@ -40,8 +41,8 @@ class Lane:
 			follow = self._car_queue[index]
 			lead = self._car_queue[index + 1]
 			follow.update_car(lead.offset, lead.vel, lead.length)
-		self._car_queue[-1].update_car(self.get_offset(True))
-		self.check_offsets()
+		lead_info = self.get_info_ahead(True)
+		self._car_queue[-1].update_car(lead_info[0], lead_info[1], lead_info[2])
 
 	def check_offsets(self):
 		count = 0
