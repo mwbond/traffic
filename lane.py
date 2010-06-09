@@ -9,10 +9,17 @@ class Lane:
 	# Lane_becomes is the lane that self turn into.
 	# It equals 0 if the lane ends.
 	# It equals None if the lane dissapears into the ether.
-	def __init__(self, length, lane_becomes=None):
+	def __init__(self, length, lane_becomes=None, rlane=None, llane=None):
 		self.length = length
 		self._car_queue = deque([])
 		self._lane_becomes = lane_becomes
+		self.rlane = rlane
+		self.llane = llane
+
+	def change_lane_becomes(new_lane_becomes):
+		"""Chanes the self._lane_becomes value.
+		Should only be used when reading init file"""
+		self._lane_becomes = new_lane_becomes
 	
 	def add_car(self, car):
 		self._car_queue.appendleft(car)
@@ -42,7 +49,7 @@ class Lane:
 			lead = self._car_queue[index + 1]
 			follow.update_car(lead.offset, lead.vel, lead.length)
 		lead_info = self.get_info_ahead(True)
-		self._car_queue[-1].update_car(lead_info[0], lead_info[1], lead_info[2])
+		self._car_queue[-1].update_car(*lead_info)
 
 	def check_offsets(self):
 		count = 0
@@ -56,10 +63,9 @@ class Lane:
 			if self._lane_becomes != None:
 				car.offset = car.offset - self.length
 				self._lane_becomes.add_car(car)
-			del car
 
-	# Print out all of the car's id, offset, and vel
 	def print_lane(self):
+		"""Print out all of the car's id, offset, and vel"""
 		for car in reversed(self._car_queue):
 			print "\tCar", car.id
 			print "Pos", car.offset, "m"

@@ -5,7 +5,7 @@
 import car
 import lane
 
-lane0 = lane.Lane(1000, None)
+lane0 = lane.Lane(1000, 0)
 lane1 = lane.Lane(1600, lane0)
 
 lane1.add_car(car.Car(0, 2, 0, 20, 6.5, 2/3.0, -3, -3.5))
