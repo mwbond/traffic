@@ -3,9 +3,9 @@
 # car.py
 
 class Car:
-	def __init__(self, id, max_accel, vel, desired_vel, length, prt,
+	def __init__(self, stream_id, max_accel, vel, desired_vel, length, prt,
 					max_brake, obs_brake):
-		self.id = id
+		self.stream_id = stream_id
 		self.max_accel = max_accel 
 		self.vel = vel
 		self.desired_vel = desired_vel
