@@ -15,7 +15,7 @@ prt = 2/3.0
 max_brake = -3
 obs_brake = -3.5
 
-lane0 = lane.Lane(1000, 0)
+"""lane0 = lane.Lane(1000, 0)
 lane1 = lane.Lane(1600, lane0)
 
 add_car(stream_id, max_accel, vel, desired_vel, length, prt, max_brake,
@@ -31,4 +31,4 @@ for step in range(1,300):
 	lane1.update_lane()
 	lane0.update_lane()
 
-	lane0.check_offsets()
+	lane0.check_offsets()"""

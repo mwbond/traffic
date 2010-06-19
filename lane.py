@@ -17,46 +17,29 @@ class Lane:
 	def add_car(self, car):
 		self.car_queue.appendleft(car)
 
-	def get_info_ahead(self, offset=0):
-		pass
-		'''if (len(self.car_queue) != 0) and (not is_cur_lane):
-			lead = self.car_queue[0]
-			return (lead.offset, lead.vel, lead.length)
-		elif self._lane_becomes == None:
-			return (None, 0, 0)
-		elif self._lane_becomes == 0:
-			return (self.length, 0, 0)
-		else:
-			info = self._lane_becomes.get_info_ahead()
-			if info[0] == None:
-				return (None, info[1], info[2])
-			else:
-				return (self.length + info[0], info[1], info[2]) '''
-
 	# Updates the lane.
 	def update_lane(self):
 		num_cars = len(self.car_queue)
-		if num_cars == 0:
-			return
 		for index in range(num_cars - 1):
 			follow = self.car_queue[index]
 			lead = self.car_queue[index + 1]
 			follow.update_car(lead.offset, lead.vel, lead.length)
-		lead_info = self.get_info_ahead(True)
-		self.car_queue[-1].update_car(*lead_info)
-		self.time += 1
+		return self.car_queue[num_cars - 1]
 
-	def check_offsets(self, id):
-		cars = []
-		count = 0
+
+	def get_unbounded(self):
+		unbounded = {}
 		num_cars = len(self.car_queue)
 		for index in reversed(range(num_cars)):
-			if self.car_queue[index].offset < self.length:
+			if self.car_queue[index].offset > self.length:
+				car = self.car_queue.pop()
+				if car.stream_id not in unbounded:
+					unbounded[car.stream_id] = [car]
+				else:
+					unbounded[car.stream_id].append(car)
+			else:
 				break
-			elif self.car_queue[index].stream_id == id:
-				cars.append(self.car_queue[index])
-				self.car_queue.remove(index)
-		return cars
+		return unbounded
 
 	def print_lane(self):
 		"""Print out all of the car's id, offset, and vel"""

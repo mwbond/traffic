@@ -6,7 +6,7 @@ class Car:
 	def __init__(self, stream_id, max_accel, vel, desired_vel, length, prt,
 					max_brake, obs_brake):
 		self.stream_id = stream_id
-		self.max_accel = max_accel 
+		self.max_accel = max_accel
 		self.vel = vel
 		self.desired_vel = desired_vel
 		self.length = length
@@ -14,7 +14,7 @@ class Car:
 		self.max_brake = max_brake
 		self.obs_brake = obs_brake
 		self.offset = 0
-	
+
 	def update_car(self, lead_offset=None, lead_vel=0, lead_length=0):
 		"""Get the new velocity depending on the lead car using the Gipps Model.
 		Brake limit is ignored by the leading vehicle if its lead is None."""
