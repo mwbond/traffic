@@ -9,7 +9,7 @@ class Lane:
 	# Lane_becomes is the lane that self turn into.
 	# It equals 0 if the lane ends.
 	# It equals None if the lane dissapears into the ether.
-	def __init__(self, length, time):
+	def __init__(self, length, time=0):
 		self.length = length
 		self.car_queue = deque([])
 		self.time = time
