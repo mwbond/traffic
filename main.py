@@ -21,7 +21,7 @@ x_lanes = []
 out_lanes = []
 for x in range(4):
 	in_lanes.append(lane.Lane(1000))
-	x_lanes.append(lane.Lane(-10))
+	x_lanes.append(lane.Lane(5))
 	out_lanes.append(lane.Lane(1000))
 	streams.append(stream.Stream(x, in_lanes[x], out_lanes[x], x_lanes[x]))
 
@@ -41,4 +41,5 @@ for step in range(500):
 
 	inter.calc_updates()
 	inter.fix_offsets()
+	inter.commit_queues()
 	print

@@ -2,6 +2,8 @@
 # Jun 16, 2010
 # intersection.py
 
+import copy
+
 import car
 import lane
 import stream
@@ -13,6 +15,11 @@ class Intersection:
 		self.out_lanes = out_lanes
 		self.streams = streams
 
+	def commit_queues(self):
+		for lanes in (self.out_lanes, self.x_lanes, self.in_lanes):
+			for lane in lanes:
+				if lane is not None:
+					lane.refrence_queue = copy.copy(lane.car_queue)
 
 	def calc_updates(self):
 		for lanes in (self.out_lanes, self.x_lanes, self.in_lanes):

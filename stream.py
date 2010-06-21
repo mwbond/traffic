@@ -17,13 +17,12 @@ class Stream:
 		gap_length = 0
 		for seg in (self.in_lane, self.x_lane, self.out_lane):
 			if (lane is seg) and (lane is not None):
-				num_cars = len(lane.car_queue)
+				num_cars = len(lane.refrence_queue)
 				for index in range(num_cars):
-					if lane.car_queue[index].offset > offset:
-						gap_length += lane.car_queue[index].offset - offset
-						vel = lane.car_queue[index].vel
-						length = lane.car_queue[index].length
-						return (gap_length, vel)
+					lead = lane.refrence_queue[index]
+					if lead.offset > offset:
+						gap_length += lead.offset - offset - lead.length
+						return (gap_length, lead.vel)
 				gap_length += lane.length - offset
 				if lane is self.in_lane:
 					lane = self.x_lane
@@ -38,13 +37,12 @@ class Stream:
 		gap_length = 0
 		for seg in (self.out_lane, self.x_lane, self.in_lane):
 			if (lane is seg) and (lane is not None):
-				num_cars = len(lane.car_queue)
+				num_cars = len(lane.refrence_queue)
 				for index in reversed(range(num_cars)):
-					if lane.car_queue[index].offset < offset:
-						gap_length += offset - lane.car_queue[index].offset
-						vel = lane.car_queue[index].vel
-						length = lane.car_queue[index].length
-						return (gap_length, vel)
+					lead = lane.refrence_queue[index]
+					if lead.offset < offset:
+						gap_length += offset - lead.offset - lead.length
+						return (gap_length, lead.vel)
 				gap_length += offset
 				if lane is self.out_lane:
 					lane = self.x_lane

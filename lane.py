@@ -12,14 +12,12 @@ class Lane:
 	def __init__(self, length, time=0):
 		self.length = length
 		self.car_queue = deque([])
-		self.queue_refrence = deque([])
+		self.refrence_queue = deque([])
 		self.time = time
 
 	def add_car(self, car):
 		self.car_queue.appendleft(car)
-
-	def commit_queue(self):
-		self.queue_refrence = self.car_queue[:]
+		self.refrence_queue.appendleft(car)
 
 	# Updates the lane.
 	def update_lane(self):
@@ -28,7 +26,7 @@ class Lane:
 			return None
 		for index in range(num_cars - 1):
 			follow = self.car_queue[index]
-			lead = self.car_queue[index + 1]
+			lead = self.refrence_queue[index + 1]
 			gap_length = lead.offset - lead.length - follow.offset
 			follow.update_car(gap_length, lead.vel)
 		return self.car_queue[num_cars - 1]
@@ -50,6 +48,6 @@ class Lane:
 
 	def print_lane(self):
 		"""Print out all of the car's id, offset, and vel"""
-		for car in reversed(self.car_queue):
+		for car in reversed(self.refrence_queue):
 			print "Pos", car.offset, "m"
 			print "Speed", car.vel, "m/s"
