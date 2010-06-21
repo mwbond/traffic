@@ -12,10 +12,14 @@ class Lane:
 	def __init__(self, length, time=0):
 		self.length = length
 		self.car_queue = deque([])
+		self.queue_refrence = deque([])
 		self.time = time
 
 	def add_car(self, car):
 		self.car_queue.appendleft(car)
+
+	def commit_queue(self):
+		self.queue_refrence = self.car_queue[:]
 
 	# Updates the lane.
 	def update_lane(self):
