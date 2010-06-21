@@ -15,6 +15,12 @@ class Intersection:
 		self.out_lanes = out_lanes
 		self.streams = streams
 
+	def update(self):
+		self.calc_updates()
+		self.fix_offsets()
+		self.commit_queues()
+
+
 	def commit_queues(self):
 		for lanes in (self.out_lanes, self.x_lanes, self.in_lanes):
 			for lane in lanes:
@@ -23,12 +29,15 @@ class Intersection:
 
 	def calc_updates(self):
 		for lanes in (self.out_lanes, self.x_lanes, self.in_lanes):
-			for lane in lanes:
-				if lane is not None:
-					car = lane.update_lane()
-					if car is not None:
-						stream = self.streams[car.stream_id]
-						lead_info = stream.info_ahead(lane, car.offset)
+			for lane in [x for x in lanes if x is not None]:
+				car = lane.update_lane()
+				if car is not None:
+					stream = self.streams[car.stream_id]
+					lead_info = stream.info_ahead(lane, car.offset)
+					if lane.stop_at_end:
+						dist = lane.length - car.offset
+						car.update_car(*lead_info, stop_dist=dist)
+					else:
 						car.update_car(*lead_info)
 
 	def fix_offsets(self):

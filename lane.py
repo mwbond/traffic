@@ -13,9 +13,11 @@ class Lane:
 		self.length = length
 		self.car_queue = deque([])
 		self.refrence_queue = deque([])
-		self.time = time
+		self.stop_at_end= False
 
 	def add_car(self, car):
+		if len(self.car_queue):
+			assert self.car_queue[0].offset > self.car_queue[0].length
 		self.car_queue.appendleft(car)
 		self.refrence_queue.appendleft(car)
 
@@ -28,7 +30,11 @@ class Lane:
 			follow = self.car_queue[index]
 			lead = self.refrence_queue[index + 1]
 			gap_length = lead.offset - lead.length - follow.offset
-			follow.update_car(gap_length, lead.vel)
+			if self.stop_at_end:
+				stop_dist = self.length - follow.offset
+				follow.update_car(gap_length, lead.vel, stop_dist)
+			else:
+				follow.update_car(gap_length, lead.vel)
 		return self.car_queue[num_cars - 1]
 
 

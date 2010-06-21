@@ -8,10 +8,6 @@ class Stream:
 		self.in_lane = in_lane
 		self.out_lane = out_lane
 		self.x_lane = x_lane
-		self.status = 0 # 0=red
-
-	def change_status(self, change):
-		self.status = change
 
 	def info_ahead(self, lane, offset):
 		gap_length = 0
