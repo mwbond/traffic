@@ -42,7 +42,7 @@ class Car:
 		# vel(t) to vel(t+1).
 		self.vel = min(brake_limit, accel_limit, stop_brake_limit)
 
-		if self.vel < 0.1:
+		if self.vel < 0.01:
 			self.vel = 0
 		self.offset = self.offset + self.vel * self.prt
 		assert self.vel >= 0
