@@ -27,8 +27,13 @@ for x in range(4):
 
 inter = intersection.Intersection(in_lanes, x_lanes, out_lanes, streams)
 
+in_lanes[1].add_car(car.Car(1, max_accel, vel,
+						desired_vel, length, prt, max_brake,
+						obs_brake))
+in_lanes[1].stop_at_end = True
+
 for step in range(500):
-	if len(in_lanes[1].car_queue):
+	'''if len(in_lanes[1].car_queue):
 		if in_lanes[1].car_queue[0].offset > 7:
 			for index in range(4):
 				in_lanes[index].add_car(car.Car(index, max_accel, vel,
@@ -38,19 +43,13 @@ for step in range(500):
 		for index in range(4):
 			in_lanes[index].add_car(car.Car(index, max_accel, vel,
 									desired_vel, length, prt, max_brake,
-									obs_brake))
-	print "***** STEP", step, "*****"
-	in_lanes[1].print_lane()
-	print
-	x_lanes[1].print_lane()
-	print
-	out_lanes[1].print_lane()
+									obs_brake))'''
 
-	if (step % 50) == 0:
-		if in_lanes[1].stop_at_end:
-			in_lanes[1].stop_at_end = False
-		else:
-			in_lanes[1].stop_at_end = True
-		print "Change of Light"
+	print "***** STEP", step, "*****"
 	inter.update()
 	print
+	in_lanes[1].print_lane()
+	print
+	'''x_lanes[1].print_lane()
+	print
+	out_lanes[1].print_lane()'''
