@@ -31,6 +31,8 @@ class Car:
 									(lead_vel ** 2) / self.obs_brake)) ** 0.5)
 		if stop_dist is None:
 			stop_brake_limit = accel_limit
+		elif (self.vel ** 2) / (-2 * self.max_brake) > stop_dist:
+			stop_brake_limit = accel_limit
 		else:
 			stop_brake_limit = (self.max_brake * self.prt +
 								((self.max_brake ** 2) * (self.prt ** 2) -
