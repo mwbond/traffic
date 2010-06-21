@@ -20,10 +20,13 @@ class Lane:
 	# Updates the lane.
 	def update_lane(self):
 		num_cars = len(self.car_queue)
+		if num_cars == 0:
+			return None
 		for index in range(num_cars - 1):
 			follow = self.car_queue[index]
 			lead = self.car_queue[index + 1]
-			follow.update_car(lead.offset, lead.vel, lead.length)
+			gap_length = lead.offset - lead.length - follow.offset
+			follow.update_car(gap_length, lead.vel)
 		return self.car_queue[num_cars - 1]
 
 
@@ -31,7 +34,7 @@ class Lane:
 		unbounded = {}
 		num_cars = len(self.car_queue)
 		for index in reversed(range(num_cars)):
-			if self.car_queue[index].offset > self.length:
+			if self.car_queue[index].offset >= self.length:
 				car = self.car_queue.pop()
 				if car.stream_id not in unbounded:
 					unbounded[car.stream_id] = [car]
@@ -44,6 +47,5 @@ class Lane:
 	def print_lane(self):
 		"""Print out all of the car's id, offset, and vel"""
 		for car in reversed(self.car_queue):
-			print "\tCar", car.id
 			print "Pos", car.offset, "m"
 			print "Speed", car.vel, "m/s"

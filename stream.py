@@ -14,65 +14,61 @@ class Stream:
 		self.status = change
 
 	def info_ahead(self, lane, offset):
-		assert offset < lane.length
-		assert offset >= 0
-		dist = 0
+		gap_length = 0
 		for seg in (self.in_lane, self.x_lane, self.out_lane):
 			if (lane is seg) and (lane is not None):
 				num_cars = len(lane.car_queue)
 				for index in range(num_cars):
 					if lane.car_queue[index].offset > offset:
-						dist += lane.car_queue[index].offset - offset
+						gap_length += lane.car_queue[index].offset - offset
 						vel = lane.car_queue[index].vel
 						length = lane.car_queue[index].length
-						return (dist, vel, length)
-				dist += lane.length - offset
+						return (gap_length, vel)
+				gap_length += lane.length - offset
 				if lane is self.in_lane:
 					lane = self.x_lane
 				if lane is self.x_lane:
 					lane = self.out_lane
 				offset = 0
-		return (None, 0, 0)
+		return (None, 0)
 
-	def dist_behind(self, lane, offset):
+	def info_behind(self, lane, offset):
 		assert offset < lane.length
 		assert offset >= 0
-		dist = 0
+		gap_length = 0
 		for seg in (self.out_lane, self.x_lane, self.in_lane):
 			if (lane is seg) and (lane is not None):
 				num_cars = len(lane.car_queue)
 				for index in reversed(range(num_cars)):
 					if lane.car_queue[index].offset < offset:
-						dist += offset - lane.car_queue[index].offset
+						gap_length += offset - lane.car_queue[index].offset
 						vel = lane.car_queue[index].vel
 						length = lane.car_queue[index].length
-						return (dist, vel, length)
-				dist += offset
+						return (gap_length, vel)
+				gap_length += offset
 				if lane is self.out_lane:
 					lane = self.x_lane
 				if lane is self.x_lane:
 					lane = self.in_lane
 				offset = lane.length
-		return (None, 0, 0)
+		return (None, 0)
 
 	def in_to_x(self, cars):
-		if self.in_lane is None:
-			return
 		for car in cars:
 			car.offset -= self.in_lane.length
-			if car.offset > self.x_lane.length:
-				car.offset -= self.x_lane.length
+			if self.x_lane is None:
 				if car.offset < self.out_lane.length:
-					if self.out_lane is not None:
-						self.out_lane.add_car(car)
+					self.out_lane.add_car(car)
 			else:
-				if self.x_lane is not None:
+				if car.offset < self.x_lane.length:
 					self.x_lane.add_car(car)
+				else:
+					car.offset -= self.x_lane.length
+					if car.offset < self.out_lane.length:
+						self.out_lane.add_car(car)
 
-	def x_to_out(self, time):
-		if self.x_lane is None:
-			return
-		for car in out_cars:
+	def x_to_out(self, cars):
+		for car in cars:
 			car.offset -= self.x_lane.length
 			if car.offset < self.out_lane.length:
 				if self.out_lane is not None:

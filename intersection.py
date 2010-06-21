@@ -19,23 +19,21 @@ class Intersection:
 			for lane in lanes:
 				if lane is not None:
 					car = lane.update_lane()
-					stream = self.streams[car.stream_id]
-					lead_info = stream.info_ahead(lane, car.offset)
-					car.update_car(*lead_info)
+					if car is not None:
+						stream = self.streams[car.stream_id]
+						lead_info = stream.info_ahead(lane, car.offset)
+						car.update_car(*lead_info)
 
 	def fix_offsets(self):
 		for lane in self.out_lanes:
-			if lane is not None:
-				unbounded = lane.get_unbounded(self)
+			unbounded = lane.get_unbounded()
 
 		for lane in self.x_lanes:
-			if lane is not None:
-				unbounded = lane.get_unbounded(self)
-				for stream_id in unbounded:
-					self.streams[stream_id].update_x(unbounded[stream_id])
+			unbounded = lane.get_unbounded()
+			for stream_id in unbounded:
+				self.streams[stream_id].x_to_out(unbounded[stream_id])
 
 		for lane in self.in_lanes:
-			if lane is not None:
-				unbounded = lane.get_unbounded(self)
-				for stream_id in unbounded:
-					self.streams[stream_id].update_in(unbounded[stream_id])
+			unbounded = lane.get_unbounded()
+			for stream_id in unbounded:
+				self.streams[stream_id].in_to_x(unbounded[stream_id])
