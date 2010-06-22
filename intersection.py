@@ -21,24 +21,9 @@ class Intersection:
 		self.commit_queues()
 
 
-	def commit_queues(self):
-		for lanes in (self.out_lanes, self.x_lanes, self.in_lanes):
-			for lane in lanes:
-				if lane is not None:
-					lane.refrence_queue = copy.copy(lane.car_queue)
-
 	def calc_updates(self):
-		for lanes in (self.out_lanes, self.x_lanes, self.in_lanes):
-			for lane in [x for x in lanes if x is not None]:
-				car = lane.update_lane()
-				if car is not None:
-					stream = self.streams[car.stream_id]
-					lead_info = stream.info_ahead(lane, car.offset)
-					if lane.stop_at_end:
-						dist = lane.length - car.offset
-						car.update_car(*lead_info, stop_dist=dist)
-					else:
-						car.update_car(*lead_info)
+		for stream in self.streams:
+			stream.update_stream()
 
 	def fix_offsets(self):
 		for lane in self.out_lanes:
@@ -53,3 +38,9 @@ class Intersection:
 			unbounded = lane.get_unbounded()
 			for stream_id in unbounded:
 				self.streams[stream_id].in_to_x(unbounded[stream_id])
+
+	def commit_queues(self):
+		for lanes in (self.out_lanes, self.x_lanes, self.in_lanes):
+			for lane in lanes:
+				if lane is not None:
+					lane.refrence_queue = copy.copy(lane.car_queue)

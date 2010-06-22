@@ -21,23 +21,6 @@ class Lane:
 		self.car_queue.appendleft(car)
 		self.refrence_queue.appendleft(car)
 
-	# Updates the lane.
-	def update_lane(self):
-		num_cars = len(self.car_queue)
-		if num_cars == 0:
-			return None
-		for index in range(num_cars - 1):
-			follow = self.car_queue[index]
-			lead = self.refrence_queue[index + 1]
-			gap_length = lead.offset - lead.length - follow.offset
-			if self.stop_at_end:
-				stop_dist = self.length - follow.offset
-				follow.update_car(gap_length, lead.vel, stop_dist)
-			else:
-				follow.update_car(gap_length, lead.vel)
-		return self.car_queue[num_cars - 1]
-
-
 	def get_unbounded(self):
 		unbounded = {}
 		num_cars = len(self.car_queue)

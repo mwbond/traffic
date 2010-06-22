@@ -21,7 +21,6 @@ class Car:
 		accel_limit = (self.vel + 2.5 * self.max_accel * self.prt *
 						(1 - self.vel / self.desired_vel) *
 						(0.025 + self.vel / self.desired_vel) ** 0.5)
-		print "accel_limit:", accel_limit
 		if gap_length is None:
 			brake_limit = accel_limit
 		else:
@@ -30,7 +29,6 @@ class Car:
 								self.max_brake *
 									(2 * gap_length - self.vel * self.prt -
 									(lead_vel ** 2) / self.obs_brake)) ** 0.5)
-			print "brake_limit:", brake_limit
 		if stop_dist is None:
 			stop_brake_limit = accel_limit
 		elif (self.vel ** 2) / (-2 * self.max_brake) > stop_dist:
@@ -40,7 +38,6 @@ class Car:
 								((self.max_brake ** 2) * (self.prt ** 2) -
 									self.max_brake * (2 * stop_dist -
 										self.vel * self.prt)) ** 0.5)
-			print "stop_brake_limit:", stop_brake_limit
 		# I am unsure if vel(t) was used from vel(t-1) to vel(t) or from
 		# vel(t) to vel(t+1).
 		self.vel = min(brake_limit, accel_limit, stop_brake_limit)

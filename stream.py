@@ -8,6 +8,21 @@ class Stream:
 		self.in_lane = in_lane
 		self.out_lane = out_lane
 		self.x_lane = x_lane
+		self.status = 0 #0=stop 1=go 2=yield
+
+	def get_stop_dist(self, lane, offset):
+		if (lane is not self.in_lane) or (self.status == 1):
+			return None
+		return lane.length - offset
+
+	def update_stream(self):
+		for lane in (self.in_lane, self.x_lane, self.out_lane):
+			if lane is not None:
+				for car in lane.car_queue:
+					if car.stream_id == self.id:
+						info = self.info_ahead(lane, car.offset)
+						dist = self.get_stop_dist(lane, car.offset)
+						car.update_car(*info, stop_dist=dist)
 
 	def info_ahead(self, lane, offset):
 		gap_length = 0
