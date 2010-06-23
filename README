@@ -1,1 +1,8 @@
 This is an extremly simple transportation simulator using Gipps' Model.
+
+Caveats:
+- Assumes all cars are homogeneous
+- Does not allow shared left turn lanes
+- Does not allow a double left turn lane
+- Only allows green arrows for left turns
+- Does not allow right turns on red
