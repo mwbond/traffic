@@ -9,12 +9,14 @@ import lane
 import stream
 
 class Intersection:
-	def __init__(self, in_lanes, x_lanes, out_lanes, streams):
+	def __init__(self, in_lanes, x_lanes, out_lanes, streams, cycle, phases):
 		self.in_lanes = in_lanes
 		self.x_lanes = x_lanes
 		self.out_lanes = out_lanes
 		self.streams = streams
-		self.time = 0
+		self.cycle = cycle
+		self.phases = phases
+		self.time = 1
 
 	def update(self):
 		self.controller()
@@ -24,7 +26,10 @@ class Intersection:
 		self.time += 1
 
 	def controller(self):
-		pass
+		timing =  time % self.cycle
+		if timing in self.phases:
+			for stream_id in self.phases[timing]:
+				self.streams[stream_id].switch_phase()
 
 	def calc_updates(self):
 		for stream in self.streams.itervalues():

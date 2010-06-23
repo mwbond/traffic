@@ -8,7 +8,13 @@ class Stream:
 		self.in_lane = in_lane
 		self.out_lane = out_lane
 		self.x_lane = x_lane
-		self.status = 0 #0=stop 1=go 2=yield
+		self.status = 0 #0=stop 1=go
+
+	def switch_phase():
+		if self.status:
+			self.status = 0
+		else:
+			self.status = 1
 
 	def get_stop_dist(self, lane, offset):
 		if (lane is not self.in_lane) or (self.status == 1):
