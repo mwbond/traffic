@@ -12,6 +12,7 @@ class Lane:
 	def __init__(self, length, nlane=None, slane=None, elane=None, wlane=None):
 		self.length = length
 		self.car_queue = deque([])
+		self.refrence_queue = deque([])
 		self.nlane = nlane
 		self.slane = slane
 		self.elane = elane
@@ -25,32 +26,49 @@ class Lane:
 		else:
 			self.car_queue.appendleft(car)
 
-	def get_info_ahead(self, is_cur_lane=False):
-		if (len(self.car_queue) != 0) and (not is_cur_lane):
-			lead = self.car_queue[0]
-			return (lead.offset, lead.vel, lead.length)
-		elif self.nlane == None:
-			return (None, 0, 0)
-		elif self.nlane == 0:
-			return (self.length, 0, 0)
-		else:
-			info = self.nlane.get_info_ahead()
-			if info[0] == None:
-				return (None, info[1], info[2])
-			else:
-				return (self.length + info[0], info[1], info[2]) 
+	def get_info_ahead(self, offset):
+		ahead = [None, 0]
+		for car in self.refrence_queue:
+			if car.offset > offset:
+				return [car.offset - car.length - offset, car.vel]
+		if self.nlane is None:
+			return [None, 0]
+		if self.nlane == 0:
+			return [self.length - offset, 0]
+		dist, vel = self.nlane.get_info_ahead(-1)
+		if dist is not None:
+			if offset == -1:
+				offset = 0
+			dist = dist + self.length
+		return [dist, vel]
+
+	def get_info_behind(self, offset):
+		behind = [None, 0]
+		for car in reversed(self.refrence_queue):
+			if car.offset <= offset:
+				return [offset - car.offset, car]
+		if self.nlane is None:
+			return None
+		dist, car = self.slane.get_info_behind(self.slane.length)
+		if dist is not None:
+			dist = dist + offset
+		return [dist, car]
 
 	# Updates the lane.
 	def update_lane(self):
-		num_cars = len(self.car_queue)
-		if num_cars == 0:
-			return
-		for index in range(num_cars - 1):
-			follow = self.car_queue[index]
-			lead = self.car_queue[index + 1]
-			follow.update_car(lead.offset, lead.vel, lead.length)
-		lead_info = self.get_info_ahead(True)
-		self.car_queue[-1].update_car(*lead_info)
+		for car in self.car_queue:
+			ninfo = self.get_info_ahead(car.offset)
+			if self.elane is None:
+				einfo = None
+			else:
+				einfo = (self.elane.get_info_ahead(car.offset) +
+						self.elane.get_info_behind(car.offset - car.length))
+			if self.wlane is None:
+				winfo = None
+			else:
+				winfo = (self.wlane.get_info_ahead(car.offset) +
+						self.wlane.get_info_behind(car.offset - car.length))
+			car.update_car(ninfo, einfo, winfo)
 
 	def check_offsets(self):
 		count = 0
