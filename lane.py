@@ -3,6 +3,7 @@
 # lane.py
 
 from collections import deque
+import copy
 import car
 
 class Lane:
@@ -27,7 +28,6 @@ class Lane:
 			self.car_queue.appendleft(car)
 
 	def get_info_ahead(self, offset):
-		ahead = [None, 0]
 		for car in self.refrence_queue:
 			if car.offset > offset:
 				return [car.offset - car.length - offset, car.vel]
@@ -43,7 +43,6 @@ class Lane:
 		return [dist, vel]
 
 	def get_info_behind(self, offset):
-		behind = [None, 0]
 		for car in reversed(self.refrence_queue):
 			if car.offset <= offset:
 				return [offset - car.offset, car]
@@ -90,3 +89,5 @@ class Lane:
 			print "\tCar", car.id
 			print "Pos", car.offset, "m"
 			print "Speed", car.vel, "m/s"
+
+		self.refrence_queue = copy.copy(self.car_queue)

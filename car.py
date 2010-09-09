@@ -15,7 +15,17 @@ class Car:
 		self.obs_brake = obs_brake
 		self.offset = 0
 	
-	def update_car(self, lead_dist=None, lead_vel=0):
+	def update_car(self, ninfo, einfo, winfo):
+		vel = self.step_vel(*ninfo)
+		evel = self.step_vel(*einfo)
+		wvel = self.step_vel(*winfo)
+		if vel < 0.01:
+			vel = 0
+		self.vel = vel
+		self.offset = self.offset + self.vel * self.prt
+		assert self.vel >= 0
+
+	def step_vel(self, lead_dist=None, lead_vel=0):
 		"""Get the new velocity depending on the lead car using the Gipps Model.
 		Brake limit is ignored by the leaing vehicle if its lead is None."""
 		accel_limit = (self.vel + 2.5 * self.max_accel * self.prt *
@@ -32,10 +42,6 @@ class Car:
 		# I am unsure if vel(t) was used from vel(t-1) to vel(t) or from
 		# vel(t) to vel(t+1).
 		if accel_limit < brake_limit:
-			self.vel = accel_limit
+			return accel_limit
 		else:
-			self.vel = brake_limit
-		if self.vel < 0.01:
-			self.vel = 0
-		self.offset = self.offset + self.vel * self.prt
-		assert self.vel >= 0
+			return brake_limit
