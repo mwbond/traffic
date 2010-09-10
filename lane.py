@@ -47,7 +47,7 @@ class Lane:
 			if car.offset <= offset:
 				return [offset - car.offset, car]
 		if self.nlane is None:
-			return None
+			return [None, 0]
 		dist, car = self.slane.get_info_behind(self.slane.length)
 		if dist is not None:
 			dist = dist + offset

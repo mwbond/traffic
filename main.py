@@ -5,8 +5,9 @@
 import car
 import lane
 
-lanel = lane.Lane(1000, None, None, laner, None)
+lanel = lane.Lane(1000, None, None, None, None)
 laner = lane.Lane(1000, None, None, None, lanel)
+lanel.elane = laner
 
 laner.add_car(car.Car(0, 2, 0, 20, 6.5, 2/3.0, -3, -3.5))
 for step in range(1,50):

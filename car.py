@@ -17,8 +17,14 @@ class Car:
 	
 	def update_car(self, ninfo, einfo, winfo):
 		vel = self.step_vel(*ninfo)
-		evel = self.step_vel(*einfo)
-		wvel = self.step_vel(*winfo)
+		if einfo is not None:
+			ndist, nvel, sdist, scar = einfo
+			dist = ndist + sdist + self.length
+			evel = scar.step_vel(ndist, nvel)
+		if winfo is not None:
+			ndist, nvel, sdist, scar = winfo
+			dist = ndist + sdist + self.length
+			wvel = self.step_vel(*winfo)
 		if vel < 0.01:
 			vel = 0
 		self.vel = vel
