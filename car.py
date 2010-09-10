@@ -20,8 +20,9 @@ class Car:
 	def update_car(self, n_info, e_info, w_info):
 		vel = self.step_vel(*n_info)
 		if e_info is not None:
-			n_dist, n_vel, s_dist, s_car = e_info
-			car_vel = self.step_vel(n_dist, n_vel)
+			e_mobil = self.mobil(vel, *e_info)
+		if w_info is not None:
+			w_mobil = self.mobil(vel, *w_info)
 
 		if vel < 0.01:
 			vel = 0
@@ -29,27 +30,21 @@ class Car:
 		self.offset = self.offset + self.vel * self.prt
 		assert self.vel >= 0
 
-	def test_step(self, s_car, n_dist, s_dist, car_vel):
+	def mobil(self, vel, n_dist, n_vel, s_dist, s_car):
+		p = 0.5 #politeness factor
+		a = 0.1 #threshold for lane changing
+		new_vel = self.step_vel(n_dist, n_vel)
+		delta = new_vel - vel
 		if s_car is None:
-			return 0
-
-		test_car = copy.copy(s_car)
-		test_vel = test_car.step_vel(n_dist + s_dist, n_vel)
-		if test_vel < 0.01:
-			test_vel = 0
-		test_car.vel = test_vel
-		test_car.offset = test_car.offset + test_car.vel * test_car.prt
-
-		car_offset = self.offset + car_vel * self.prt
-		if test_car.offset > car_offset:
+			s_delta = 0
+		else:
+			dist = n_dist and (n_dist + s_dist)
+			s_vel = s_car.step_vel(dist, n_vel)
+			new_s_vel = s_car.step_vel(s_dist - self.length, self.vel)
+			s_delta = s_vel - new_s_vel
+		if -s_delta < s_car.max_brake:
 			return None
-		test_vel = test_car.step_vel(car_offset - test_car.offset, car_vel)
-		if test_vel < 0.01:
-			test_vel = 0
-		if (test_vel - test_car.vel) < test_car.max_brake:
-			return None
-		return test_car.vel test_vel
-		test_car.offset = test_car.offset + test_car.vel * test_car.prt
+		return delta - p * s_delta - a
 
 	def step_vel(self, lead_dist=None, lead_vel=0):
 		"""Get the new velocity depending on the lead car using the Gipps Model.
