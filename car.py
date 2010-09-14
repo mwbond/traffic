@@ -20,18 +20,33 @@ class Car:
 	def update_car(self, n_info, e_info, w_info):
 		vel = self.step_vel(*n_info)
 		if e_info is not None:
-			e_mobil = self.mobil(vel, *e_info)
+			e_mobil, e_vel = self.mobil(vel, *e_info)
+		else:
+			e_mobil = None
 		if w_info is not None:
-			w_mobil = self.mobil(vel, *w_info)
+			w_mobil, w_vel = self.mobil(vel, *w_info)
+		else:
+			w_mobil = None
+		delta = vel - self.vel
+		decision = max(delta, e_mobil, w_mobil)
+		if decision is e_mobil:
+			vel = e_vel
+			dir = 1
+		if decision is w_mobil:
+			vel = w_vel
+			dir = -1
+		else:
+			dir = 0
 
 		if vel < 0.01:
 			vel = 0
 		self.vel = vel
 		self.offset = self.offset + self.vel * self.prt
 		assert self.vel >= 0
+		return dir
 
 	def mobil(self, vel, n_dist, n_vel, s_dist, s_car):
-		p = 0.5 #politeness factor
+		p = 0.0 #politeness factor
 		a = 0.1 #threshold for lane changing
 		new_vel = self.step_vel(n_dist, n_vel)
 		delta = new_vel - vel
@@ -42,9 +57,9 @@ class Car:
 			s_vel = s_car.step_vel(dist, n_vel)
 			new_s_vel = s_car.step_vel(s_dist - self.length, self.vel)
 			s_delta = s_vel - new_s_vel
-		if -s_delta < s_car.max_brake:
-			return None
-		return delta - p * s_delta - a
+			if -s_delta < s_car.max_brake:
+				return None, 0
+		return delta - p * s_delta - a, new_vel
 
 	def step_vel(self, lead_dist=None, lead_vel=0):
 		"""Get the new velocity depending on the lead car using the Gipps Model.
