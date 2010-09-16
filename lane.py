@@ -20,19 +20,23 @@ class Lane:
 		self.w_lane = w_lane
 		self.index = -1
 
+	# Returns the offset of the car indicated by self.index
+	# Returns None if index is invalid
 	def get_index_offset(self):
 		if self.index < 0:
 			return None
 		else:
 			return self.refrence_queue[self.index].offset
 
+	# Removes the car from self.refrence_queue
 	def refrence_remove(self, car_id):
 		for index in range(len(self.refrence_queue)):
 			if self.refrence_queue[index].id == car_id:
 				self.refrence_queue.pop(index)
-				return
+				break
 
-
+	# Inserts given the car into self.car_queue based on offset
+	# If ref is True, it also inserts the given car into self.refrence_queue
 	def add_car(self, car, ref=False):
 		if car.offset >= self.length:
 			if self.n_lane != None:
@@ -52,6 +56,9 @@ class Lane:
 						foo = index
 				self.refrence_queue.insert(foo + 1, car)
 
+	# Returns the distance from the front of car A to the back of car B and
+	# the velocity of car B where car B is the car immediately in front of
+	# car A in this lane
 	def get_info_ahead(self, offset):
 		for car in self.refrence_queue:
 			if car.offset > offset:
@@ -67,6 +74,8 @@ class Lane:
 			dist = dist + self.length
 		return [dist, vel]
 
+	# Returns the distance from the front of car A to the front of car B and
+	# car B itself where car B is the car immediately behind car A in this lane
 	def get_info_behind(self, offset):
 		for car in reversed(self.refrence_queue):
 			if car.offset <= offset:
@@ -78,7 +87,7 @@ class Lane:
 			dist = dist + offset
 		return [dist, car]
 
-	# Updates the lane.
+	# Updates the car in self.car_queue indicated by self.index
 	def update_lane(self):
 		car = self.car_queue[self.index]
 		n_info = self.get_info_ahead(car.offset)
@@ -103,6 +112,8 @@ class Lane:
 			self.car_queue.remove(car)
 		self.index = self.index - 1
 
+	# Moves cars to the next lane if their offsets are longer than the
+	# length of the lane
 	def check_offsets(self):
 		count = 0
 		for car in reversed(self.car_queue):
@@ -116,6 +127,8 @@ class Lane:
 				car.offset = car.offset - self.length
 				self.n_lane.add_car(car)
 
+	# Prints out relevent info for the lane; also last two lines do important
+	# stuff every cycle
 	def print_lane(self):
 		"""Print out all of the car's id, offset, and vel"""
 		print "        --LANE--"
