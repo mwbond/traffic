@@ -20,11 +20,15 @@ class Car:
 	def update_car(self, n_info, e_info, w_info):
 		vel = self.step_vel(*n_info)
 		if e_info is not None:
+			print 'east', e_info, self.id, self.offset
 			e_mobil, e_vel = self.mobil(vel, *e_info)
+			print 'east', 'done'
 		else:
 			e_mobil = None
 		if w_info is not None:
+			print 'west', w_info, self.id, self.offset
 			w_mobil, w_vel = self.mobil(vel, *w_info)
+			print 'west', 'done'
 		else:
 			w_mobil = None
 		delta = vel - self.vel
@@ -64,6 +68,7 @@ class Car:
 	def step_vel(self, lead_dist=None, lead_vel=0):
 		"""Get the new velocity depending on the lead car using the Gipps Model.
 		Brake limit is ignored by the leaing vehicle if its lead is None."""
+		#print self.id, lead_dist, lead_vel
 		accel_limit = (self.vel + 2.5 * self.max_accel * self.prt *
 						(1 - self.vel / self.desired_vel) *
 						(0.025 + self.vel / self.desired_vel) ** 0.5)

@@ -2,7 +2,6 @@
 # Mar 25, 2010
 # lane.py
 
-from collections import deque
 import copy
 import car
 
@@ -10,7 +9,8 @@ class Lane:
 	# Lane_becomes is the lane that self turn into.
 	# It equals 0 if the lane ends.
 	# It equals None if the lane dissapears into the ether.
-	def __init__(self, length, n_lane=None, s_lane=None, e_lane=None, w_lane=None):
+	def __init__(self, length, n_lane=None, s_lane=None, e_lane=None,
+					w_lane=None):
 		self.length = length
 		self.car_queue = []
 		self.refrence_queue = []
@@ -18,6 +18,13 @@ class Lane:
 		self.s_lane = s_lane
 		self.e_lane = e_lane
 		self.w_lane = w_lane
+		self.index = -1
+
+	def get_index_offset(self):
+		if self.index < 0:
+			return None
+		else:
+			return self.refrence_queue[self.index].offset
 
 	def add_car(self, car, ref=False):
 		if car.offset >= self.length:
@@ -65,7 +72,8 @@ class Lane:
 		return [dist, car]
 
 	# Updates the lane.
-	def update_lane(self, car):
+	def update_lane(self):
+		car = self.car_queue[self.index]
 		n_info = self.get_info_ahead(car.offset)
 		if self.e_lane is None:
 			e_info = None
@@ -86,7 +94,7 @@ class Lane:
 			self.w_lane.add_car(car, True)
 			self.refrence_queue.remove(car)
 			self.car_queue.remove(car)
-
+		self.index = self.index - 1
 
 	def check_offsets(self):
 		count = 0
@@ -109,4 +117,5 @@ class Lane:
 			print "Pos", car.offset, "m"
 			print "Speed", car.vel, "m/s"
 
-		self.refrence_queue = copy.copy(self.car_queue)
+		self.refrence_queue = copy.deepcopy(self.car_queue)
+		self.index = len(self.refrence_queue) - 1
