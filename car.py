@@ -20,15 +20,11 @@ class Car:
 	def update_car(self, n_info, e_info, w_info):
 		vel = self.step_vel(*n_info)
 		if e_info is not None:
-			print 'east', e_info, self.id, self.offset
 			e_mobil, e_vel = self.mobil(vel, *e_info)
-			print 'east', 'done'
 		else:
 			e_mobil = None
 		if w_info is not None:
-			print 'west', w_info, self.id, self.offset
 			w_mobil, w_vel = self.mobil(vel, *w_info)
-			print 'west', 'done'
 		else:
 			w_mobil = None
 		delta = vel - self.vel
@@ -36,7 +32,7 @@ class Car:
 		if decision is e_mobil:
 			vel = e_vel
 			dir = 1
-		if decision is w_mobil:
+		elif decision is w_mobil:
 			vel = w_vel
 			dir = -1
 		else:
@@ -52,10 +48,14 @@ class Car:
 	def mobil(self, vel, n_dist, n_vel, s_dist, s_car):
 		p = 0.0 #politeness factor
 		a = 0.1 #threshold for lane changing
+		if (n_dist is not None) and (n_dist <= 0):
+			return None, 0
 		new_vel = self.step_vel(n_dist, n_vel)
 		delta = new_vel - vel
 		if s_car is None:
 			s_delta = 0
+		elif s_dist < self.length:
+			return None, 0
 		else:
 			dist = n_dist and (n_dist + s_dist)
 			s_vel = s_car.step_vel(dist, n_vel)
@@ -68,7 +68,6 @@ class Car:
 	def step_vel(self, lead_dist=None, lead_vel=0):
 		"""Get the new velocity depending on the lead car using the Gipps Model.
 		Brake limit is ignored by the leaing vehicle if its lead is None."""
-		#print self.id, lead_dist, lead_vel
 		accel_limit = (self.vel + 2.5 * self.max_accel * self.prt *
 						(1 - self.vel / self.desired_vel) *
 						(0.025 + self.vel / self.desired_vel) ** 0.5)

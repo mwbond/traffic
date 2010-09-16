@@ -26,6 +26,13 @@ class Lane:
 		else:
 			return self.refrence_queue[self.index].offset
 
+	def refrence_remove(self, car_id):
+		for index in range(len(self.refrence_queue)):
+			if self.refrence_queue[index].id == car_id:
+				self.refrence_queue.pop(index)
+				return
+
+
 	def add_car(self, car, ref=False):
 		if car.offset >= self.length:
 			if self.n_lane != None:
@@ -79,20 +86,20 @@ class Lane:
 			e_info = None
 		else:
 			e_info = (self.e_lane.get_info_ahead(car.offset) +
-					self.e_lane.get_info_behind(car.offset - car.length))
+					self.e_lane.get_info_behind(car.offset))
 		if self.w_lane is None:
 			w_info = None
 		else:
 			w_info = (self.w_lane.get_info_ahead(car.offset) +
-					self.w_lane.get_info_behind(car.offset - car.length))
+					self.w_lane.get_info_behind(car.offset))
 		dir = car.update_car(n_info, e_info, w_info)
 		if dir == 1:
 			self.e_lane.add_car(car, True)
-			self.refrence_queue.remove(car)
+			self.refrence_remove(car.id)
 			self.car_queue.remove(car)
 		if dir == -1:
 			self.w_lane.add_car(car, True)
-			self.refrence_queue.remove(car)
+			self.refrence_remove(car.id)
 			self.car_queue.remove(car)
 		self.index = self.index - 1
 
