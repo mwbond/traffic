@@ -37,7 +37,7 @@ class Lane:
 
 	# Inserts given the car into self.car_queue based on offset
 	# If ref is True, it also inserts the given car into self.refrence_queue
-	def add_car(self, car, ref=False):
+	def add_car(self, car, ref=False, ref_car=None):
 		if car.offset >= self.length:
 			if self.n_lane != None:
 				car.offset = car.offset - self.length
@@ -50,11 +50,12 @@ class Lane:
 			self.car_queue.insert(foo + 1, car)
 
 			if ref:
+				assert ref_car is not None
 				foo = -1
 				for index in range(len(self.refrence_queue)):
 					if self.refrence_queue[index].offset < car.offset:
 						foo = index
-				self.refrence_queue.insert(foo + 1, car)
+				self.refrence_queue.insert(foo + 1, ref_car)
 
 	# Returns the distance from the front of car A to the back of car B and
 	# the velocity of car B where car B is the car immediately in front of
@@ -62,16 +63,15 @@ class Lane:
 	def get_info_ahead(self, offset):
 		for car in self.refrence_queue:
 			if car.offset > offset:
+				offset = max(offset, 0)
 				return [car.offset - car.length - offset, car.vel]
 		if self.n_lane is None:
 			return [None, 0]
 		if self.n_lane == 0:
+			offset = max(offset, 0)
 			return [self.length - offset, 0]
 		dist, vel = self.n_lane.get_info_ahead(-1)
-		if dist is not None:
-			if offset == -1:
-				offset = 0
-			dist = dist + self.length
+		dist = dist and dist + self.length
 		return [dist, vel]
 
 	# Returns the distance from the front of car A to the front of car B and
@@ -101,13 +101,18 @@ class Lane:
 		else:
 			w_info = (self.w_lane.get_info_ahead(car.offset) +
 					self.w_lane.get_info_behind(car.offset))
-		dir = car.update_car(n_info, e_info, w_info)
+		dir, vel = car.update_car(n_info, e_info, w_info)
 		if dir == 1:
-			self.e_lane.add_car(car, True)
-			self.refrence_remove(car.id)
-			self.car_queue.remove(car)
-		if dir == -1:
-			self.w_lane.add_car(car, True)
+			target_lane = self.e_lane
+		elif dir == -1:
+			target_lane = self.w_lane
+		else:
+			target_lane = self
+		ref_car = copy.deepcopy(car)
+		car.vel = vel
+		car.offset = car.offset + car.vel * car.prt
+		if target_lane is not self:
+			target_lane.add_car(car, True, ref_car)
 			self.refrence_remove(car.id)
 			self.car_queue.remove(car)
 		self.index = self.index - 1

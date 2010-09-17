@@ -40,30 +40,29 @@ class Car:
 
 		if vel < 0.01:
 			vel = 0
-		self.vel = vel
-		self.offset = self.offset + self.vel * self.prt
-		assert self.vel >= 0
-		return dir
+		#self.vel = vel
+		#self.offset = self.offset + self.vel * self.prt
+		return [dir, vel]
 
 	def mobil(self, vel, n_dist, n_vel, s_dist, s_car):
 		p = 0.0 #politeness factor
 		a = 0.1 #threshold for lane changing
 		if (n_dist is not None) and (n_dist <= 0):
-			return None, 0
+			return [None, 0]
 		new_vel = self.step_vel(n_dist, n_vel)
 		delta = new_vel - vel
 		if s_car is None:
 			s_delta = 0
 		elif s_dist < self.length:
-			return None, 0
+			return [None, 0]
 		else:
 			dist = n_dist and (n_dist + s_dist)
 			s_vel = s_car.step_vel(dist, n_vel)
 			new_s_vel = s_car.step_vel(s_dist - self.length, self.vel)
 			s_delta = s_vel - new_s_vel
 			if -s_delta < s_car.max_brake:
-				return None, 0
-		return delta - p * s_delta - a, new_vel
+				return [None, 0]
+		return [delta - p * s_delta - a, new_vel]
 
 	def step_vel(self, lead_dist=None, lead_vel=0):
 		"""Get the new velocity depending on the lead car using the Gipps Model.
